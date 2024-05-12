@@ -8,7 +8,10 @@ import java.util.Random;
 
 public class GameJFrame extends JFrame implements KeyListener {
     int [][]data=new int[4][4];
+    int [][]win={{1,2,3,4},{5,6,7,8},{9,10,11,12},{13,14,15,0}};
+    boolean winflag=false;
     int x=0,y=0;
+    String path="image\\girl\\girl1\\";
     //游戏主界面
     public GameJFrame(){
         initJFrame();
@@ -34,9 +37,15 @@ public class GameJFrame extends JFrame implements KeyListener {
 
     private void initImage() {//初始化图片
         this.getContentPane().removeAll();
+        if(judgeWin()){
+            ImageIcon victor=new ImageIcon("image\\win.png");
+            JLabel jLabel = new JLabel(victor);
+            jLabel.setBounds(200,60,197,73);
+            this.getContentPane().add(jLabel);
+        }
         for(int i=0;i<4;i++){
             for(int j=0;j<4;j++) {
-                ImageIcon icon = new ImageIcon("image\\girl\\girl1\\" + data[i][j] + ".jpg");
+                ImageIcon icon = new ImageIcon(path + data[i][j] + ".jpg");
                 if(data[i][j]==0){
                     x=i;
                     y=j;
@@ -87,7 +96,15 @@ public class GameJFrame extends JFrame implements KeyListener {
         this.setLayout(null);
         this.addKeyListener(this);
     }
-
+    public boolean judgeWin(){
+       for(int i=0;i<4;i++){
+           for(int j=0;j<4;j++){
+               if(data[i][j]!=win[i][j]) return false;
+           }
+       }
+       winflag=true;
+       return true;
+    }
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -95,13 +112,38 @@ public class GameJFrame extends JFrame implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-
+        if(winflag) return;
+        int code=e.getKeyCode();
+        if(code==65){
+            this.getContentPane().removeAll();
+            ImageIcon icon=new ImageIcon(path+"all.jpg");
+            JLabel jLabel=new JLabel(icon);
+            jLabel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+            jLabel.setBounds(80,100,420,420);
+            ImageIcon icon1=new ImageIcon("image\\background1.png");
+            JLabel jLabel1=new JLabel(icon1);
+            jLabel1.setBounds(0,0,700,700);
+            this.getContentPane().add(jLabel);
+            this.add(jLabel);
+            this.add(jLabel1);
+            this.repaint();
+        }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
+        if(winflag) return;
         int code=e.getKeyCode();
-        if(code==38){
+        System.out.println(code);
+        if(code==87){
+            for(int i=0;i<=15;i++){
+                data[i/4][i%4]=i+1;
+            }
+            data[3][3]=0;
+            initImage();
+        }else if(code==65){
+            initImage();
+        }else if(code==38){
             if(x+1<=3 && x+1>=0) {
                 data[x][y]=data[x+1][y];
                 data[x+1][y]=0;
