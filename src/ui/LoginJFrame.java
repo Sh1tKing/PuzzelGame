@@ -9,6 +9,6 @@ public class LoginJFrame extends JFrame {
         this.setTitle("账号登录");
         this.setAlwaysOnTop(true);
         this.setLocationRelativeTo(null);
-        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 }

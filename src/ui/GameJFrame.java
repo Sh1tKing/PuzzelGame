@@ -2,16 +2,29 @@ package ui;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Objects;
 import java.util.Random;
 
-public class GameJFrame extends JFrame implements KeyListener {
+public class GameJFrame extends JFrame implements KeyListener, ActionListener {
     int [][]data=new int[4][4];
     int [][]win={{1,2,3,4},{5,6,7,8},{9,10,11,12},{13,14,15,0}};
-    boolean winflag=false;
-    int x=0,y=0;
+    int x=0,y=0,step=0;
     String path="image\\girl\\girl1\\";
+
+    //对象条目
+    JMenuItem restartItem=new JMenuItem("重新开始");
+    JMenuItem terminalItem=new JMenuItem("关闭游戏");
+    JMenuItem accountItem=new JMenuItem("github地址");
+    JMenuItem girlItem=new JMenuItem("女孩");
+    JMenuItem animalItem=new JMenuItem("动物");
+    JMenuItem sportItem=new JMenuItem("运动");
+
+
     //游戏主界面
     public GameJFrame(){
         initJFrame();
@@ -37,6 +50,10 @@ public class GameJFrame extends JFrame implements KeyListener {
 
     private void initImage() {//初始化图片
         this.getContentPane().removeAll();
+        JLabel steplabel=new JLabel("步数："+step);
+        steplabel.setForeground(Color.white);
+        steplabel.setBounds(30,30,100,50);
+        this.getContentPane().add(steplabel);
         if(judgeWin()){
             ImageIcon victor=new ImageIcon("image\\win.png");
             JLabel jLabel = new JLabel(victor);
@@ -71,14 +88,22 @@ public class GameJFrame extends JFrame implements KeyListener {
         //菜单对象
         JMenu functionJMenu=new JMenu("功能");
         JMenu aboutJMenu=new JMenu("关于作者");
-        //对象条目
-        JMenuItem restartItem=new JMenuItem("重新开始");
-        JMenuItem reloginItem=new JMenuItem("重新登录");
-        JMenuItem terminalItem=new JMenuItem("关闭游戏登录");
-        JMenuItem accountItem=new JMenuItem("github地址");
+
+        JMenu changephotomenu=new JMenu("更换图片");
+
+        restartItem.addActionListener(this);
+        terminalItem.addActionListener(this);
+        accountItem.addActionListener(this);
+        girlItem.addActionListener(this);
+        animalItem.addActionListener(this);
+        sportItem.addActionListener(this);
+
+        functionJMenu.add(changephotomenu);
+        changephotomenu.add(girlItem);
+        changephotomenu.add(animalItem);
+        changephotomenu.add(sportItem);
 
         functionJMenu.add(restartItem);
-        functionJMenu.add(reloginItem);
         functionJMenu.add(terminalItem);
         aboutJMenu.add(accountItem);
 
@@ -92,7 +117,7 @@ public class GameJFrame extends JFrame implements KeyListener {
         this.setTitle("拼图小游戏V1.0");
         this.setAlwaysOnTop(true);
         this.setLocationRelativeTo(null);
-        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.setLayout(null);
         this.addKeyListener(this);
     }
@@ -102,7 +127,6 @@ public class GameJFrame extends JFrame implements KeyListener {
                if(data[i][j]!=win[i][j]) return false;
            }
        }
-       winflag=true;
        return true;
     }
     @Override
@@ -112,7 +136,7 @@ public class GameJFrame extends JFrame implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if(winflag) return;
+        if(judgeWin()) return;
         int code=e.getKeyCode();
         if(code==65){
             this.getContentPane().removeAll();
@@ -132,9 +156,8 @@ public class GameJFrame extends JFrame implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-        if(winflag) return;
+        if(judgeWin()) return;
         int code=e.getKeyCode();
-        System.out.println(code);
         if(code==87){
             for(int i=0;i<=15;i++){
                 data[i/4][i%4]=i+1;
@@ -147,26 +170,71 @@ public class GameJFrame extends JFrame implements KeyListener {
             if(x+1<=3 && x+1>=0) {
                 data[x][y]=data[x+1][y];
                 data[x+1][y]=0;
+                step++;
                 initImage();
             }
         }else if(code==40){
             if(x-1<=3 && x-1>=0) {
                 data[x][y]=data[x-1][y];
                 data[x-1][y]=0;
+                step++;
                 initImage();
             }
         }else if(code==37){
             if(y+1<=3 && y+1>=0) {
                 data[x][y]=data[x][y+1];
                 data[x][y+1]=0;
+                step++;
                 initImage();
             }
         }else if(code==39){
             if(y-1<=3 && y-1>=0) {
                 data[x][y]=data[x][y-1];
                 data[x][y-1]=0;
+                step++;
                 initImage();
             }
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Object obj=e.getSource();
+        if(obj==restartItem){
+            step=0;
+            initData();
+            initImage();
+        }else if(obj==terminalItem){
+            System.exit(0);
+        }else if(obj==accountItem){
+            JDialog jDialog=new JDialog();
+            JLabel jLabel=new JLabel("https://github.com/Sh1tKing/PuzzleGame.git");
+            jLabel.setBounds(0,0,200,50);
+            jDialog.setSize(280,400);
+            jDialog.getContentPane().add(jLabel);
+
+            jDialog.setLocationRelativeTo(null);
+            jDialog.setAlwaysOnTop(true);
+            jDialog.setModal(true);
+            jDialog.setVisible(true);
+        }else if(obj==girlItem){
+            Random r=new Random();
+            int seed=r.nextInt(12)+1;
+            path="image\\girl\\girl"+seed+"\\";
+            initData();
+            initImage();
+        }else if(obj==sportItem){
+            Random r=new Random();
+            int seed=r.nextInt(9)+1;
+            path="image\\sport\\sport"+seed+"\\";
+            initData();
+            initImage();
+        }else if(obj==animalItem){
+            Random r=new Random();
+            int seed=r.nextInt(7)+1;
+            path="image\\animal\\animal"+seed+"\\";
+            initData();
+            initImage();
         }
     }
 }
